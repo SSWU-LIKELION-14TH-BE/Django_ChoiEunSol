@@ -7,8 +7,10 @@
 <body>
     <h2>로그인</h2>
 
-    {% if error %}
-        <p>{{ error }}</p>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
     {% endif %}
 
     <form method="post">

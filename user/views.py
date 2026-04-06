@@ -1,8 +1,13 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib import messages
+from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
 from .forms import SignUpForm
 
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -15,19 +20,22 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        form = AuthenticationForm(request, data=request.POST)
 
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
             return redirect('home')
         else:
-            return render(request, 'login.html', {'error': '아이디 또는 비밀번호가 틀렸습니다.'})
+            messages.error(request, "아이디 또는 비밀번호가 틀렸습니다.")
+    else:
+        form = AuthenticationForm()
 
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'form': form})
 
 def logout_view(request):
     if request.method == 'POST':
