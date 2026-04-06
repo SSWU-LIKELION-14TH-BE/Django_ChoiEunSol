@@ -8,19 +8,25 @@
 <body>
     <h1>{{ post.title }}</h1>
     <p>작성자: {{ post.author.nickname }}</p>
-    <p>{{ post.content }}</p>
-
     <p>기술 스택: {{ post.get_tech_stack_display }}</p>
+    <p>{{ post.content }}</p>
+    
+    {% for image in post.images.all %}
+        <img src="{{ image.image.url }}" width="300">
+        <br>
+    {% endfor %}
 
     {% if post.github_url %}
         <a href="{{ post.github_url }}">GitHub</a>
     {% endif %}
     <br>
 
-    {% for image in post.images.all %}
-        <img src="{{ image.image.url }}" width="300">
-        <br>
-    {% endfor %}
+    <form method="POST" action="{% url 'post_like' post.pk %}">
+        {% csrf_token %}
+        <button type="submit">
+            ❤️ {{ post.likes.count }}
+        </button>
+    </form>
 
     {% if request.user == post.author %}
         <form action="{% url 'post_delete' post.pk %}" method="POST">
@@ -28,5 +34,94 @@
             <button type="submit">삭제</button>
         </form>
     {% endif %}
+
+    <hr>
+
+    <h3>댓글 작성</h3>
+    <form method="POST" action="{% url 'comment_create' post.pk %}">
+        {% csrf_token %}
+        <input type="text" name="content">
+        <button type="submit">작성</button>
+    </form>
+
+    <hr>
+
+    <h3>댓글</h3>
+
+    {% for comment in post.comments.all %}
+        {% if comment.parent == None %}
+            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                <p>
+                    {{ comment.author.nickname }} |
+                    {{ comment.created_at }}
+                </p>
+                <p>{{ comment.content }}</p>
+
+                {% if request.user == comment.author %}
+                    <form method="POST" action="{% url 'comment_delete' post.pk comment.pk %}">
+                        {% csrf_token %}
+                        <button type="submit">삭제</button>
+                    </form>
+                {% endif %}
+
+                <form method="POST" action="{% url 'comment_like' post.pk comment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">
+                        ❤️ {{ comment.likes.count }}
+                    </button>
+                </form>
+
+                <button onclick="toggleReplyForm({{ comment.id }})">
+                    답글 달기
+                </button>
+
+                <form id="reply-form-{{ comment.id }}"
+                      method="POST"
+                      action="{% url 'comment_create' post.pk %}"
+                      style="display:none;">
+                    {% csrf_token %}
+                    <input type="text" name="content" placeholder="대댓글 작성">
+                    <input type="hidden" name="parent" value="{{ comment.id }}">
+                    <button type="submit">작성</button>
+                </form>
+
+                {% for reply in comment.comment_set.all %}
+                    <div style="margin-left:20px; border-top:1px solid #ddd; padding-top:5px;">
+                        <p>
+                            {{ reply.author.nickname }} |
+                            {{ reply.created_at }}
+                        </p>
+                        <p>{{ reply.content }}</p>
+
+                        {% if request.user == reply.author %}
+                            <form method="POST" action="{% url 'comment_delete' post.pk reply.pk %}">
+                                {% csrf_token %}
+                                <button type="submit">삭제</button>
+                            </form>
+                        {% endif %}
+                        <form method="POST" action="{% url 'comment_like' post.pk reply.pk %}">
+                            {% csrf_token %}
+                            <button type="submit">
+                                ❤️ {{ reply.likes.count }}
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <!-- JS -->
+    <script>
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById('reply-form-' + commentId);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+    </script>
 </body>
 </html>
