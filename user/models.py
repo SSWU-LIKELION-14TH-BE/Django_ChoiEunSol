@@ -7,7 +7,7 @@ class CustomUser(AbstractUser):
         regex=r'^010-\d{4}-\d{4}$',
         message="전화번호는 010-0000-0000 형식으로 입력해주세요."
     )
-    phone_number = models.CharField(max_length=13, validators=[phone_regex], blank=True, null=True)
+    phone_number = models.CharField(max_length=13, validators=[phone_regex])
     nickname = models.CharField(max_length=20, unique=True)
 
     groups=models.ManyToManyField(Group, related_name="customuser_set", blank=True)
