@@ -8,8 +8,6 @@ class SignUpForm(UserCreationForm):
     phone_number = forms.CharField(label="전화번호")
     nickname = forms.CharField(label="닉네임")
 
-    password1 = forms.CharField(label="비밀번호", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="비밀번호 확인", widget=forms.PasswordInput)
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'phone_number', 'nickname', 'password1', 'password2']
