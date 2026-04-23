@@ -16,6 +16,7 @@ class Post(models.Model):
     tech_stack = models.CharField(max_length=20, choices=TECH_CHOICES)
     github_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    views = models.PositiveIntegerField(default=0)
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
