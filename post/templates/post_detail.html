@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 목록</title>
+    <title>게시글 상세</title>
 </head>
 <body>
     <h1>{{ post.title }}</h1>
@@ -27,6 +27,10 @@
             ❤️ {{ post.likes.count }}
         </button>
     </form>
+
+    <a href="{% url 'post_list' %}">
+        <button>목록으로</button>
+    </a>
 
     {% if request.user == post.author %}
         <form action="{% url 'post_delete' post.pk %}" method="POST">
@@ -71,7 +75,7 @@
                     </button>
                 </form>
 
-                <button onclick="toggleReplyForm({{ comment.id }})">
+                <button onclick="toggleReplyForm('{{ comment.id }}')">
                     답글 달기
                 </button>
 

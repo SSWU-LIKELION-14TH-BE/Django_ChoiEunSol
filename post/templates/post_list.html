@@ -7,12 +7,34 @@
 <body>
     <h1>게시글 목록</h1>
 
-    <a href="{% url 'post_create' %}">글쓰기</a>
+    <form method="GET">
+        <input type="text" name="q" placeholder="제목 검색" value="{{ query|default_if_none:'' }}">
+
+        <select name="sort">
+            <option value="latest" {% if sort == 'latest' %}selected{% endif %}>최신순</option>
+            <option value="popular" {% if sort == 'popular' %}selected{% endif %}>인기순</option>
+        </select>
+
+        <button type="submit">검색</button>
+    </form>
+
+    <a href="{% url 'post_create' %}">
+        <button>글쓰기</button>
+    </a>
+
+    <hr>
 
     {% for post in posts %}
-        <a href="{% url 'post_detail' post.pk %}">
-            <h3>{{ post.title }}</h3>
-        </a>
+        <div style="margin-bottom:20px;">
+            <a href="{% url 'post_detail' post.pk %}">
+                <h3>{{ post.title }}</h3>
+            </a>
+
+            <p>❤️: {{ post.likes.count }}</p>
+        </div>
+    {% empty %}
+        <p>검색 결과가 없습니다.</p>
     {% endfor %}
+
 </body>
 </html>
