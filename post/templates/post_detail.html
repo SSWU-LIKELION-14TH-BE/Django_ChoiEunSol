@@ -27,6 +27,7 @@
             ❤️ {{ post.likes.count }}
         </button>
     </form>
+    <p>조회수: {{ post.views }}</p>
 
     <a href="{% url 'post_list' %}">
         <button>목록으로</button>

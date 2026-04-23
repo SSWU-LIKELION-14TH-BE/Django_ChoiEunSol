@@ -3,7 +3,7 @@ from .forms import PostForm
 from django.contrib.auth.decorators import login_required
 from .models import Post, PostImage, Comment, CommentLike, PostLike
 from django.views.decorators.http import require_POST
-from django.db.models import Count
+from django.db.models import Count, F
 
 @login_required
 def post_create(request):
@@ -132,3 +132,12 @@ def post_list(request):
         'query': query,
         'sort': sort
     })
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    post.views = F('views') + 1
+    post.save()
+    post.refresh_from_db()
+
+    return render(request, 'post_detail.html', {'post': post})
