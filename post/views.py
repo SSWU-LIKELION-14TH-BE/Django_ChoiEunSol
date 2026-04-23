@@ -3,6 +3,7 @@ from .forms import PostForm
 from django.contrib.auth.decorators import login_required
 from .models import Post, PostImage, Comment, CommentLike, PostLike
 from django.views.decorators.http import require_POST
+from django.db.models import Count
 
 @login_required
 def post_create(request):
@@ -99,3 +100,35 @@ def comment_like_toggle(request, pk, comment_pk):
         like.delete()
 
     return redirect('post_detail', pk=pk)
+
+def post_list(request):
+    posts = Post.objects.all()
+
+    query = request.GET.get('q')
+    if query:
+        posts = posts.filter(title__icontains=query)
+
+    return render(request, 'post_list.html', {
+        'posts': posts,
+        'query': query
+    })
+
+def post_list(request):
+    posts = Post.objects.all()
+
+    query = request.GET.get('q')
+    if query:
+        posts = posts.filter(title__icontains=query)
+
+    sort = request.GET.get('sort')
+
+    if sort == 'popular':
+        posts = posts.annotate(num_likes=Count('likes')).order_by('-num_likes')
+    else:
+        posts = posts.order_by('-created_at')
+
+    return render(request, 'post_list.html', {
+        'posts': posts,
+        'query': query,
+        'sort': sort
+    })
