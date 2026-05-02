@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import signup_view, login_view, logout_view, home_view
+from .views import signup_view, login_view, logout_view, home_view, mypage, edit_profile, check_password
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -30,4 +30,8 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+    
+    path('mypage/', mypage, name='mypage'),
+    path('mypage/edit/', edit_profile, name='edit_profile'),
+    path('mypage/password/', check_password, name='check_password'),
 ]
