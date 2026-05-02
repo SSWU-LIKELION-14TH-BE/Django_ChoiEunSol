@@ -14,12 +14,21 @@
             {% csrf_token %}
             <button type="submit">로그아웃</button>
         </form>
+
         <a href="{% url 'post_list' %}">
             <button>목록으로</button>
         </a>
+
+        <a href="{% url 'profile' request.user.id %}">
+            <button>내 페이지</button>
+        </a>
     {% else %}
-        <a href="{% url 'login' %}">로그인</a>
-        <a href="{% url 'signup' %}">회원가입</a>
+        <a href="{% url 'login' %}">
+            <button>로그인</button>
+        </a>
+        <a href="{% url 'signup' %}">
+            <button>회원가입</button>
+        </a>
     {% endif %}
 </body>
 </html>

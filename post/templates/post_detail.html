@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>{{ post.title }}</h1>
-    <p>작성자: {{ post.author.nickname }}</p>
+    <p>작성자: <a href="{% url 'profile' post.author.id %}">{{ post.author.nickname }}</a></p>
     <p>기술 스택: {{ post.get_tech_stack_display }}</p>
     <p>{{ post.content }}</p>
     
@@ -60,8 +60,11 @@
         {% if comment.parent == None %}
             <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 <p>
-                    {{ comment.author.nickname }} |
-                    {{ comment.created_at }}
+                <a href="{% url 'profile' comment.author.id %}">
+                    {{ comment.author.nickname }}
+                </a>
+                |
+                {{ comment.created_at }}
                 </p>
                 <p>{{ comment.content }}</p>
 
@@ -96,8 +99,11 @@
                 {% for reply in comment.comment_set.all %}
                     <div style="margin-left:20px; border-top:1px solid #ddd; padding-top:5px;">
                         <p>
-                            {{ reply.author.nickname }} |
-                            {{ reply.created_at }}
+                        <a href="{% url 'profile' reply.author.id %}">
+                            {{ reply.author.nickname }}
+                        </a>
+                        |
+                        {{ reply.created_at }}
                         </p>
                         <p>{{ reply.content }}</p>
 

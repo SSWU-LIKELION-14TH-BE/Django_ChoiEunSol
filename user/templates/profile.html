@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+</head>
+<body>
+    <h2>{{ profile_user.nickname }}님의 페이지</h2>
+    
+    {% if request.user == profile_user %}
+        <a href="{% url 'check_password' %}">
+            <button>정보 수정</button>
+        </a>
+    {% endif %}
+    
+    <a href="{% url 'guestbook' profile_user.id %}">
+        <button>방명록</button>
+    </a>
+
+    <hr>
+
+    <h2>게시물</h2>
+
+    {% for post in posts %}
+        <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px; border-radius:8px;">
+        
+            <h3>
+                <a href="{% url 'post_detail' post.pk %}">
+                    {{ post.title }}
+                </a>
+            </h3>
+
+            {% if request.user == profile_user %}
+                <div>
+                    <a href="{% url 'post_update' post.pk %}">
+                        <button>수정</button>
+                    </a>
+
+                    <form method="POST" action="{% url 'post_delete' post.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                        <button type="submit">삭제</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>작성한 게시글이 없습니다.</p>
+    {% endfor %}
+
+    <a href="{% url 'post_list' %}">
+        <button>목록으로</button>
+    </a>
+</body>
+</html>
