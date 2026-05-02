@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import SignUpForm
 from django.contrib.auth.decorators import login_required
+from .models import CustomUser, Guestbook
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -48,16 +49,6 @@ def home_view(request):
     return render(request, 'home.html')
 
 @login_required
-def mypage(request):
-    user = request.user
-    posts = user.post_set.all()
-
-    return render(request, 'mypage.html', {
-        'user': user,
-        'posts': posts
-    })
-
-@login_required
 def check_password(request):
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -99,11 +90,67 @@ def edit_profile(request):
             user.set_password(new_password)
             update_session_auth_hash(request, user)
 
+        if CustomUser.objects.exclude(pk=user.pk).filter(username=request.POST.get('username')).exists():
+            messages.error(request, "이미 존재하는 아이디입니다.")
+            return redirect('edit_profile')
+
         user.save()
 
         request.session['verified'] = False
         messages.success(request, "정보 수정 완료!")
-        
-        return redirect('mypage')
+
+        return redirect('profile', user_id=request.user.id)
 
     return render(request, 'edit_profile.html')
+
+def profile(request, user_id):
+    user_obj = get_object_or_404(CustomUser, pk=user_id)
+
+    posts = user_obj.post_set.all()
+    guestbooks = user_obj.guestbooks.all().order_by('-created_at')
+
+    return render(request, 'profile.html', {
+        'profile_user': user_obj,
+        'posts': posts,
+        'guestbooks': guestbooks
+    })
+
+def guestbook(request, user_id):
+    owner = get_object_or_404(CustomUser, pk=user_id)
+    guestbook_list = owner.guestbooks.all()
+
+    return render(request, 'guestbook.html', {
+        'owner': owner,
+        'guestbook_list': guestbook_list
+    })
+
+@login_required
+def guestbook_create(request, user_id):
+    owner = get_object_or_404(CustomUser, pk=user_id)
+
+    if owner == request.user:
+        return redirect('guestbook', user_id=user_id)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+
+        if content:
+            Guestbook.objects.create(
+                owner=owner,
+                author=request.user,
+                content=content
+            )
+
+    return redirect('guestbook', user_id=user_id)
+
+@login_required
+def guestbook_delete(request, user_id, guestbook_id):
+    guestbook = get_object_or_404(Guestbook, pk=guestbook_id)
+
+    if guestbook.author != request.user:
+        return redirect('guestbook', user_id=user_id)
+
+    if request.method == 'POST':
+        guestbook.delete()
+
+    return redirect('guestbook', user_id=user_id)

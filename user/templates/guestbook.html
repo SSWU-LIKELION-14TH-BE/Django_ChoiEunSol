@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>방명록</title>
+</head>
+<body>
+    <h2>{{ owner.nickname }}님의 방명록</h2>
+
+    <a href="{% url 'profile' owner.id %}">
+        <button>프로필로 돌아가기</button>
+    </a>
+
+    {% if request.user != owner %}
+    <form method="POST" action="{% url 'guestbook_create' owner.id %}">
+        {% csrf_token %}
+        <input type="text" name="content" placeholder="방명록 남기기">
+        <button type="submit">작성</button>
+    </form>
+    {% endif %}
+
+    <hr>
+
+    {% for msg in guestbook_list %}
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <p>
+                <a href="{% url 'profile' msg.author.id %}">
+                    {{ msg.author.nickname }}
+                </a>
+                | {{ msg.created_at|date:"Y-m-d H:i" }}
+            </p>
+            <p>{{ msg.content }}</p>
+            {% if request.user == msg.author %}
+            <form method="POST" action="{% url 'guestbook_delete' owner.id msg.id %}">
+                {% csrf_token %}
+                <button type="submit">삭제</button>
+            </form>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>아직 방명록이 없습니다.</p>
+    {% endfor %}
+</body>
+</html>
