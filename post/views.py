@@ -26,14 +26,6 @@ def post_create(request):
 
     return render(request, 'post_create.html', {'form': form})
 
-def post_list(request):
-    posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'post_list.html', {'posts': posts})
-
-def post_detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    return render(request, 'post_detail.html', {'post': post})
-
 @login_required
 def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -108,18 +100,6 @@ def post_list(request):
     if query:
         posts = posts.filter(title__icontains=query)
 
-    return render(request, 'post_list.html', {
-        'posts': posts,
-        'query': query
-    })
-
-def post_list(request):
-    posts = Post.objects.all()
-
-    query = request.GET.get('q')
-    if query:
-        posts = posts.filter(title__icontains=query)
-
     sort = request.GET.get('sort')
 
     if sort == 'popular':
@@ -141,3 +121,33 @@ def post_detail(request, pk):
     post.refresh_from_db()
 
     return render(request, 'post_detail.html', {'post': post})
+
+@login_required
+def post_update(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.user != post.author:
+        return redirect('post_detail', pk=pk)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+
+        if form.is_valid():
+            form.save()
+
+            delete_ids = request.POST.getlist('delete_images')
+            for img_id in delete_ids:
+                PostImage.objects.filter(id=img_id).delete()
+
+            files = request.FILES.getlist('images')
+            for file in files:
+                PostImage.objects.create(post=post, image=file)
+
+            return redirect('post_detail', pk=pk)
+    else:
+        form = PostForm(instance=post)
+
+    return render(request, 'post_update.html', {
+        'form': form,
+        'post': post
+    })

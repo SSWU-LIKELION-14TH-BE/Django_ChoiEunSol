@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 수정</title>
+</head>
+<body>
+    <h2>게시글 수정</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <p>기존 이미지</p>
+        {% for image in post.images.all %}
+            <div>
+                <img src="{{ image.image.url }}" width="100">
+
+                <input type="checkbox" name="delete_images" value="{{ image.id }}">
+                삭제
+            </div>
+        {% endfor %}
+
+        <p>이미지 추가</p>
+        <input type="file" name="images" multiple>
+
+        <button type="submit">수정</button>
+    </form>
+</body>
+</html>

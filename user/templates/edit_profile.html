@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정보수정</title>
+</head>
+<body>
+    <h2>정보 수정</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text" name="username" value="{{ user.username }}">
+        <input type="text" name="nickname" value="{{ user.nickname }}">
+
+        <input type="password" name="new_password" placeholder="새 비밀번호">
+        <input type="password" name="confirm_password" placeholder="새 비밀번호 확인">
+
+        <button type="submit">수정</button>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
