@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import signup_view, login_view, logout_view, home_view, mypage, edit_profile, check_password
+from .views import signup_view, login_view, logout_view, home_view, profile, edit_profile, check_password, guestbook, guestbook_create, guestbook_delete
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -30,8 +30,11 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
-    
-    path('mypage/', mypage, name='mypage'),
-    path('mypage/edit/', edit_profile, name='edit_profile'),
-    path('mypage/password/', check_password, name='check_password'),
+
+    path('profile/<int:user_id>/', profile, name='profile'),
+    path('profile/edit/', edit_profile, name='edit_profile'),
+    path('profile/password/', check_password, name='check_password'),
+    path('guestbook/<int:user_id>/', guestbook, name='guestbook'),
+    path('guestbook/<int:user_id>/create/', guestbook_create, name='guestbook_create'),
+    path('guestbook/<int:user_id>/delete/<int:guestbook_id>/', guestbook_delete, name='guestbook_delete'),
 ]
