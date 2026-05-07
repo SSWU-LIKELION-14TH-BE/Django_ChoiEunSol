@@ -50,6 +50,10 @@ def home_view(request):
 
 @login_required
 def check_password(request):
+    # 소셜 로그인 유저인지 확인
+    if request.user.socialaccount_set.exists():
+        request.session['verified'] = True
+        return redirect('edit_profile')
     if request.method == 'POST':
         password = request.POST.get('password')
 
