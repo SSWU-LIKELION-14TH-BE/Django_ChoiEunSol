@@ -9,7 +9,7 @@ class CustomUser(AbstractUser):
         message="전화번호는 010-0000-0000 형식으로 입력해주세요."
     )
     phone_number = models.CharField(max_length=13, validators=[phone_regex], default="010-0000-0000")
-    nickname = models.CharField(max_length=20, unique=True)
+    nickname = models.CharField(max_length=20, null=True, blank=True)
 
     groups=models.ManyToManyField(Group, related_name="customuser_set", blank=True)
     user_permissions=models.ManyToManyField(Permission, related_name="customuser_permissions_set", blank=True)

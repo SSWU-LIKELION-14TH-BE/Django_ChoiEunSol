@@ -1,8 +1,22 @@
-<!DOCTYPE html>
+{% load socialaccount %} <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
+    <style>
+        .social-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px 0;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            width: 150px;
+        }
+        .kakao { background-color: #FEE500; color: #3c1e1e; }
+        .naver { background-color: #03C75A; color: white; }
+    </style>
 </head>
 <body>
     <h2>로그인</h2>
@@ -19,6 +33,17 @@
         <button type="submit">로그인</button>
     </form>
     
+    <hr> <div class="social-login">
+        <a href="{% provider_login_url 'kakao' %}" class="social-btn kakao">
+            카카오 로그인
+        </a>
+        <br>
+        <a href="{% provider_login_url 'naver' %}" class="social-btn naver">
+            네이버 로그인
+        </a>
+    </div>
+
+    <br>
     <a href="{% url 'password_reset' %}">
         <button type="button">비밀번호 찾기</button>
     </a>
